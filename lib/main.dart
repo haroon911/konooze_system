@@ -18,12 +18,12 @@ class RealEstateManagementApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       locale: const Locale('ar', 'SA'),
-      title: 'Flutter Demo',
+      title: 'konooze system demo',
       theme: ThemeData(
           fontFamily: "Cairo",
           colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.deepPurpleAccent,
-            brightness: Brightness.light,
+            brightness: Brightness.dark,
           )),
       getPages: routes,
       debugShowCheckedModeBanner: false,

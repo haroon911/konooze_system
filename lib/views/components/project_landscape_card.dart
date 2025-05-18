@@ -8,17 +8,17 @@ import 'package:konooze_system/views/components/auth/shared/blur_effect.dart';
 
 class ProjectLandscapeCard extends StatelessWidget {
   const ProjectLandscapeCard({super.key, required this.property});
-    final Property property;
-
+  final Property property;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      Card(
+    return Stack(
+      children: [
+        Card(
           elevation: 0,
           clipBehavior: Clip.antiAlias,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -26,13 +26,12 @@ class ProjectLandscapeCard extends StatelessWidget {
                     "${ApiLinks.propertyImageLink}/${property.images.first}"),
                 fit: BoxFit.cover,
                 opacity: 0.2,
-                
+
                 // colorFilter: ColorFilter.mode(
                 //     Get.theme.colorScheme.primary.withValues(alpha: 0.1),
                 //     BlendMode.srcOver),
               ),
             ),
-
             child: InkWell(
               borderRadius: BorderRadius.circular(18),
               onTap: () => Get.toNamed(AppRoutes.propertyDetails,
@@ -41,36 +40,51 @@ class ProjectLandscapeCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                    const BlureFilter(sigmaX: 100, sigmaY: 100  , height: 1 ,width: 1,),
+                  const BlureFilter(
+                    sigmaX: 100,
+                    sigmaY: 100,
+                    height: 1,
+                    width: 1,
+                  ),
                   Hero(
                     tag:
                         "image${property.id}no${property.images.indexOf(property.images.first)}",
                     child: Card(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18
-                          )),
+                          borderRadius: BorderRadius.circular(18)),
                       elevation: 0,
                       clipBehavior: Clip.antiAlias,
                       child: CachedNetworkImage(
-                          filterQuality: FilterQuality.medium,
-                          imageUrl:
-                              "${ApiLinks.propertyImageLink}/${property.images.first}"),
+                        filterQuality: FilterQuality.medium,
+                        imageUrl:
+                            "${ApiLinks.propertyImageLink}/${property.images.first}",
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
                     ),
                   ),
-                     Container(
-                    padding:  const EdgeInsets.only(top: 5 , left: 10 , right: 10 ,bottom: 5),
+                  Container(
+                    padding: const EdgeInsets.only(
+                        top: 5, left: 10, right: 10, bottom: 5),
                     child: Text(
                       property.name,
-                      style: Get.textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
+                      style: Get.textTheme.titleMedium!
+                          .copyWith(fontWeight: FontWeight.w600),
                       maxLines: 2,
                       overflow: TextOverflow.fade,
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.only(bottom: 20 , left: 10 , right: 10),
+                    padding:
+                        const EdgeInsets.only(bottom: 20, left: 10, right: 10),
                     child: Text(
                       property.details,
-                      style: Get.textTheme.labelSmall!.copyWith(fontWeight: FontWeight.w500 ,letterSpacing: 0 , color: Get.theme.colorScheme.primary ),
+                      style: Get.textTheme.labelSmall!.copyWith(
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0,
+                          color: Get.theme.colorScheme.primary),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -79,7 +93,9 @@ class ProjectLandscapeCard extends StatelessWidget {
               ),
             ),
           ),
-        ),],);
+        ),
+      ],
+    );
   }
 }
 

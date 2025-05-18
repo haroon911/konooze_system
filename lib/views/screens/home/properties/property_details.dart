@@ -16,12 +16,13 @@ class PropertyDetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PropertyDetailsController propertyDetailsController =Get.put(PropertyDetailsController());
+    PropertyDetailsController propertyDetailsController =
+        Get.put(PropertyDetailsController());
     Get.put(UnitsController());
 
     return Scaffold(
       appBar: AppBar(
-        title:Text(propertyDetailsController.property.name),
+        title: Text(propertyDetailsController.property.name),
       ),
       body: GetBuilder<PropertyDetailsController>(builder: (controller) {
         return DataRequestHandler(
@@ -44,8 +45,8 @@ class PropertyDetailsScreen extends StatelessWidget {
                     const PropertyImagesSlider(),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                ),
+                        horizontal: 10,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -55,8 +56,8 @@ class PropertyDetailsScreen extends StatelessWidget {
                             crossAxisAlignment: WrapCrossAlignment.center,
                             children: [
                               Padding(
-                                padding:
-                                    const EdgeInsets.all(18.0).copyWith(right: 0),
+                                padding: const EdgeInsets.all(18.0)
+                                    .copyWith(right: 0),
                                 child: Text(controller.property.name,
                                     style: Get.textTheme.headlineMedium!),
                               ),
@@ -108,12 +109,25 @@ class UnitsInfo extends StatelessWidget {
         spacing: 15,
         runSpacing: 15,
         children: [
+          // ...List.generate(
+          //   controller.units.length,
+          //   (index) => CardButton(
+          //     title: controller.units[index].name,
+          //     content: controller.units[index].status,
+          //     icon: Icons.store_rounded,
+          //     backgroundColor: controller.units[index].status == "leased" ||
+          //             controller.units[index].status == "sold"
+          //         ? Colors.green.shade300
+          //         : Colors.red.shade300,
+          //   ),
+          // ),
           CardButton(
               title: "${controller.units.fold(
                 0,
-                (previousValue, element) => element.status == "leased"
-                    ? ++previousValue
-                    : previousValue,
+                (previousValue, element) =>
+                    element.status == "leased" || element.status == "sold"
+                        ? ++previousValue
+                        : previousValue,
               )}",
               content: "المؤجرة",
               icon: Icons.store_rounded,
@@ -160,8 +174,8 @@ class PropertyImagesSlider extends GetView<PropertyDetailsController> {
           ),
           options: CarouselOptions(
             animateToClosest: true,
-            
-            aspectRatio:  1.6,
+
+            aspectRatio: 1.6,
             // viewportFraction: 1.1,
             clipBehavior: Clip.antiAlias,
             initialPage: 0,

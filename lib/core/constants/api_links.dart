@@ -1,7 +1,7 @@
 // for real phone setup
 //first from computer we go to cmd and write ipconfig
 // second we copy the ip and write it down here>>> then done :)
-const String serverLinkName = "http://10.0.2.2/hamour"; // for emulator
+// const String serverLinkName = "http://10.0.2.2/hamour"; // for emulator
 // const String serverLinkName = "http://192.168.1.5/hamour";
 // const String serverLinkName = "http://127.0.0.1/hamour"; //for pc
 // const String linkSignup = "$serverLinkName/auth/signup.php";
@@ -15,8 +15,8 @@ const String serverLinkName = "http://10.0.2.2/hamour"; // for emulator
 
 class ApiLinks {
   //keep changin serverLinkName with your server link or in local write your ipconfig in cmd
-  // static const String _ipAddress = "10.0.2.2/dashboard"; //for emulator
-  static const String _ipAddress = "192.168.100.27/dashboard"; //for emulator
+  static const String _ipAddress = "127.0.0.1/dashboard"; //for emulator
+  // static const String _ipAddress = "192.168.100.21/dashboard"; //for emulator
   // static const String _ipAddress = "localhost/dashboard";
   static const String server = "http://$_ipAddress/konooze";
   static const String imageLink = "$server/uploads/images";

@@ -49,7 +49,7 @@ class UnitCard extends GetView<UnitsController> {
         Card(
           clipBehavior: Clip.antiAlias,
           elevation: 0,
-          color: unit.status == 'leased'
+          color: unit.status == 'leased' || unit.status == 'sold'
               ? Colors.green.shade300.withAlpha(20)
               : Colors.red.shade300.withAlpha(20),
           shape:

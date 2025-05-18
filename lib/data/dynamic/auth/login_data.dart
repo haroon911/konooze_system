@@ -9,11 +9,10 @@ class LoginData {
   getData({
     required String email,
     required String password,
-    
   }) async {
     var response = await crud.postData(ApiLinks.login, {
-      "email": email,
-      "password": password,
+      "email": email.trim(),
+      "password": password.trim(),
     });
     debugPrint('"---------"+$response');
 

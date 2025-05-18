@@ -48,6 +48,9 @@ class ClientsLandscapeCard extends GetView<ClientsController> {
                     child: CachedNetworkImage(
                       imageUrl:
                           "${ApiLinks.clientImageLink}/${client.imageUrl}",
+                           placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(),
+                        ),
                       fit: BoxFit.cover,
                       height: 100,
                       width: 100,
