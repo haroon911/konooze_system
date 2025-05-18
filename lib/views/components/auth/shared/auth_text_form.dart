@@ -45,23 +45,25 @@ class AuthTextFormField extends StatelessWidget {
         autofillHints: autofillHints,
         obscureText: obscureText,
         controller: controller,
-        onSaved: (newValue) => onSaved,
+        onSaved: onSaved,
         onChanged: onChanged,
         validator: validator,
         keyboardType: keyboardType,
         decoration: InputDecoration(
           labelText: labelText.tr,
           hintText: hintText.tr,
-          suffixIcon: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: IconButton(
-              onPressed: onIconPressed,
-              icon: Icon(
-                icon,
-                size: 25,
-              ),
-            ),
-          ),
+          suffixIcon: icon != null
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: IconButton(
+                    onPressed: onIconPressed,
+                    icon: Icon(
+                      icon,
+                      size: 25,
+                    ),
+                  ),
+                )
+              : null,
           //hamour style
           labelStyle: const TextStyle(fontSize: 20),
 
@@ -69,7 +71,8 @@ class AuthTextFormField extends StatelessWidget {
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 42, vertical: 20),
           filled: true,
-          fillColor: Get.theme.colorScheme.outlineVariant.withValues(alpha:0.3),
+          fillColor:
+              Get.theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
           enabledBorder: outlineInputBorder,
           focusedBorder: outlineInputBorder.copyWith(
               borderSide: BorderSide(color: Get.theme.colorScheme.primary)),
@@ -94,5 +97,3 @@ class AuthTextFormField extends StatelessWidget {
 //     return false;
 //   }
 // }
-
-

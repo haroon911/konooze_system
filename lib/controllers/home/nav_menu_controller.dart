@@ -44,6 +44,11 @@ class NavMenuController extends GetxController
     update();
   }
 
+  void setExtended(bool value) {
+    extended = value;
+    update();
+  }
+
   @override
   void onInit() {
     bottomNavBarItems = List.generate(

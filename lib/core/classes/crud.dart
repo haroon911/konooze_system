@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http; // Remove http import
+import 'package:dio/dio.dart'; // Import dio
 import 'package:konooze_system/core/classes/status_request.dart';
 import 'package:path/path.dart';
 
@@ -20,95 +21,160 @@ class Crud {
     'Content-Type': 'application/json',
   };
 
-  /// Sends a POST request with form data.
+  // Create a Dio instance
+  final Dio _dio = Dio();
+
+  /// Sends a POST request with form data using Dio.
   Future<Either<StatusRequest, Map>> postData(
       String url, Map<String, dynamic> data) async {
-    // try {
-    // Check internet connection
-    // Uncomment this if `checkInternetConnection` is implemented
-    // if (!await checkInternetConnection()) {
-    //   return left(StatusRequest.offlineFailure);
-    // }
+    try {
+      // Check internet connection (optional, might work differently with Dio/web)
+      // if (!await checkInternetConnection()) {
+      //   return left(StatusRequest.offlineFailure);
+      // }
 
-    // Send POST request
-    var response = await http.post(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: data, // not jsonEncode(data)
-    );
-    print(jsonEncode(data));
-    // Handle response
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      Map<String, dynamic> responseBody =
-          response.body.isNotEmpty ? jsonDecode(response.body) : {};
-      return right(responseBody);
-    } else {
-      debugPrint('Server Error: ${response.statusCode} - ${response.body}');
+      debugPrint('Sending POST to: $url');
+      debugPrint('Request Data: ${jsonEncode(data)}'); // Log request data
+
+      // Create headers specifically for form-urlencoded data, excluding application/json
+      Map<String, String> headersForFormData = Map.from(defaultHeaders);
+      headersForFormData
+          .remove('Content-Type'); // Remove the default application/json header
+
+      // Send POST request using Dio
+      var response = await _dio.post(
+        url,
+        options: Options(
+          contentType: Headers
+              .formUrlEncodedContentType, // Explicitly set form-urlencoded content type
+          headers:
+              headersForFormData, // Use the modified headers (includes Authorization, excludes default Content-Type)
+        ),
+        data:
+            data, // Pass the map directly, dio handles form encoding with the correct contentType
+      );
+
+      debugPrint(
+          'Response Status Code: ${response.statusCode}'); // Log status code
+
+      // Handle response
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Dio often decodes JSON automatically based on Content-Type
+        // Ensure response.data is treated as a Map<String, dynamic>
+        Map<String, dynamic> responseBody = response.data is Map
+            ? Map<String, dynamic>.from(response.data)
+            : {};
+        debugPrint(
+            'Successful Response Body: ${jsonEncode(responseBody)}'); // Log successful response body
+        return right(responseBody);
+      } else {
+        debugPrint('Server Error Status: ${response.statusCode}');
+        debugPrint(
+            'Error Response Data: ${response.data}'); // Log response.data for non-200 status
+        // You might want more granular error handling based on status code or response data
+        return left(StatusRequest.serverFailure);
+      }
+    } on DioException catch (e) {
+      // Handle Dio-specific errors
+      debugPrint('DioException caught: ${e.type}'); // Log DioException type
+      debugPrint(
+          'DioException Message: ${e.message}'); // Log DioException message
+      debugPrint(
+          'DioException Response Data: ${e.response?.data}'); // Log response data on error
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.unknown) {
+        debugPrint('Dio Error: Connection or Unknown error');
+        return left(StatusRequest
+            .offlineFailure); // Assuming connection issues are offline
+      } else if (e.type == DioExceptionType.badResponse) {
+        debugPrint('Dio Error: Bad response - ${e.response?.statusCode}');
+        debugPrint('Dio Error Response Data: ${e.response?.data}');
+        // You might want more granular error handling based on status code or response data
+        return left(StatusRequest
+            .serverFailure); // Treat bad response as server failure
+      } else if (e.type == DioExceptionType.cancel) {
+        debugPrint('Dio Error: Request cancelled');
+        return left(StatusRequest
+            .serverFailure); // Or a specific cancelled status if you have one
+      } else {
+        debugPrint('Dio Error: Other type - ${e.type}');
+        return left(StatusRequest.serverFailure);
+      }
+    } catch (e) {
+      // Catch any other unexpected errors
+      debugPrint(
+          'Unexpected Error Type: ${e.runtimeType}'); // Log unexpected error type
+      debugPrint('Unexpected Error: $e'); // Log unexpected error details
       return left(StatusRequest.serverFailure);
     }
   }
-  //   } on SocketException {
-  //     debugPrint('No Internet Connection');
-  //     return left(StatusRequest.offlineFailure);
-  //   } on FormatException {
-  //     debugPrint('Invalid Response Format  ');
-  //     return left(StatusRequest.invalidResponse);
-  //   } catch (e) {
-  //     debugPrint('Unexpected Error: $e');
-  //     return left(StatusRequest.serverFailure);
-  //   }
-  // }
 
-  /// Sends a POST request with a file upload.
+  /// Sends a POST request with a file upload using Dio.
   Future<Either<StatusRequest, Map>> postRequestWithFile(
       String url, Map<String, dynamic> data, File file) async {
     try {
-      // Prepare multipart request
-      var request = http.MultipartRequest("POST", Uri.parse(url));
-      var fileLength = await file.length();
-      var stream = http.ByteStream(file.openRead());
-      var multiPartFile = http.MultipartFile(
-        "file",
-        stream,
-        fileLength,
-        filename: basename(file.path),
-      );
-
-      // Add file and data to request
-      request.files.add(multiPartFile);
-      data.forEach((key, value) {
-        request.fields[key] = value.toString();
+      // Prepare form data with file
+      String fileName = basename(file.path);
+      FormData formData = FormData.fromMap({
+        for (var entry in data.entries) entry.key: entry.value,
+        "file": await MultipartFile.fromFile(file.path, filename: fileName),
       });
 
-      // Add headers
-      request.headers.addAll(defaultHeaders);
+      // Remove Content-Type from defaultHeaders as Dio handles it for FormData
+      Map<String, String> headersForFormData = Map.from(defaultHeaders);
+      headersForFormData.remove('Content-Type');
 
-      // Send request
-      var myRequest = await request.send();
-      var response = await http.Response.fromStream(myRequest);
+      // Send POST request with FormData using Dio
+      var response = await _dio.post(
+        url,
+        data: formData,
+        options: Options(headers: headersForFormData), // Use modified headers
+      );
 
-      // Handle response
-      if (myRequest.statusCode == 200 || myRequest.statusCode == 201) {
-        Map<String, dynamic> responseBody =
-            response.body.isNotEmpty ? jsonDecode(response.body) : {};
+      // Handle response (similar to postData)
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        Map<String, dynamic> responseBody = response.data is Map
+            ? Map<String, dynamic>.from(response.data)
+            : {};
+        debugPrint('Successful Response Body: ${jsonEncode(responseBody)}');
         return right(responseBody);
       } else {
-        debugPrint('Server Error: ${myRequest.statusCode}');
+        debugPrint('Server Error: ${response.statusCode}');
+        debugPrint('Error Response Data: ${response.data}');
         return left(StatusRequest.serverFailure);
       }
-    } on SocketException {
-      debugPrint('No Internet Connection');
-      return left(StatusRequest.offlineFailure);
-    } on FormatException {
-      debugPrint('Invalid Response Format');
-      return left(StatusRequest.invalidResponse);
+    } on DioException catch (e) {
+      // Handle Dio-specific errors (similar to postData)
+      debugPrint('DioException caught: ${e.type}');
+      debugPrint('DioException Message: ${e.message}');
+      debugPrint('DioException Response Data: ${e.response?.data}');
+
+      if (e.type == DioExceptionType.connectionError ||
+          e.type == DioExceptionType.unknown) {
+        debugPrint('Dio Error: Connection or Unknown error');
+        return left(StatusRequest.offlineFailure);
+      } else if (e.type == DioExceptionType.badResponse) {
+        debugPrint('Dio Error: Bad response - ${e.response?.statusCode}');
+        debugPrint('Dio Error Response Data: ${e.response?.data}');
+        return left(StatusRequest.serverFailure);
+      } else if (e.type == DioExceptionType.cancel) {
+        debugPrint('Dio Error: Request cancelled');
+        return left(StatusRequest.serverFailure);
+      } else {
+        debugPrint('Dio Error: Other type - ${e.type}');
+        return left(StatusRequest.serverFailure);
+      }
     } catch (e) {
+      // Catch any other unexpected errors
+      debugPrint('Unexpected Error Type: ${e.runtimeType}');
       debugPrint('Unexpected Error: $e');
       return left(StatusRequest.serverFailure);
     }
   }
 }
 
+// Keep the commented out sections as they might contain useful references or alternative implementations.
 // import 'dart:convert';
 // import 'dart:io';
 
@@ -166,7 +232,9 @@ class Crud {
 //   //     if (myRequest.statusCode == 200) {
 //   //       Map responseBody = jsonDecode(response.body);
 //   //       return right(responseBody);
-//   //     } else {
+//   //     }
+//   //     // Removed incorrect 'else {' that caused syntax error
+//   //     else {
 //   //       return left(StatusRequest.serverFailure);
 //   //     }
 //   //   } catch (e) {
@@ -199,7 +267,8 @@ class Crud {
 // //     } else {
 // //       debugPrint('Error ${response.statusCode}');
 // //     }
-// //   } catch (e) {
+// //   }
+// //   catch (e) {
 // //     print('Error catched $e');
 // //     return <String, dynamic>{};
 // //   }
