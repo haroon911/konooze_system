@@ -7,7 +7,6 @@ class NavRailMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return GetBuilder<NavMenuController>(builder: (controller) {
       return NavigationRail(
         leading: DrawerHeader(
@@ -38,9 +37,13 @@ class NavRailMenu extends StatelessWidget {
             ),
           ],
         )),
-        trailing: IconButton(
-            onPressed: controller.onLogoutPressed,
-            icon: const Icon(Icons.exit_to_app_rounded)),
+        trailing: Column(
+          children: [
+            IconButton(
+                onPressed: controller.onLogoutPressed,
+                icon: const Icon(Icons.exit_to_app_rounded)),
+          ],
+        ),
         elevation: 5,
         extended: controller.extended,
         selectedIndex: controller.tab,

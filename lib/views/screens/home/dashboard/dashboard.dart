@@ -74,8 +74,34 @@ class DashHeader extends GetView<DashboardController> {
               )),
           const BlureFilter(sigmaX: 50, sigmaY: 50),
           Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             decoration: BoxDecoration(
-                color: Get.theme.canvasColor.withValues(alpha:0.5),
+              color: Get.theme.colorScheme.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(32),
+            ),
+            child: Wrap(
+              children: [
+                Icon(Icons.notifications, color: Get.theme.colorScheme.primary),
+                const SizedBox(width: 16),
+                CircleAvatar(
+                  radius: 24,
+                  backgroundColor: Get.theme.colorScheme.primary,
+                  child: Icon(Icons.person, color: Colors.white, size: 28),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  " ${controller.konoozeServices.sharedPrefrences.getString("userName")}",
+                  style: Get.textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 120),
+            decoration: BoxDecoration(
+                color: Get.theme.canvasColor.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(20)),
             child: GridView(
               shrinkWrap: true,
@@ -88,7 +114,7 @@ class DashHeader extends GetView<DashboardController> {
                   shadowColor: Colors.transparent,
                   shape: ContinuousRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
-                  color: Get.theme.cardColor.withValues(alpha:0.5),
+                  color: Get.theme.cardColor.withValues(alpha: 0.5),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Wrap(
@@ -115,7 +141,7 @@ class DashHeader extends GetView<DashboardController> {
                   shadowColor: Colors.transparent,
                   shape: ContinuousRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
-                  color: Get.theme.cardColor.withValues(alpha:0.5),
+                  color: Get.theme.cardColor.withValues(alpha: 0.5),
                   child: Stack(
                     alignment: Alignment.centerRight,
                     children: [
@@ -131,7 +157,7 @@ class DashHeader extends GetView<DashboardController> {
                   shadowColor: Colors.transparent,
                   shape: ContinuousRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
-                  color: Get.theme.cardColor.withValues(alpha:0.5),
+                  color: Get.theme.cardColor.withValues(alpha: 0.5),
                   child: Stack(
                     alignment: Alignment.centerRight,
                     children: [
@@ -139,7 +165,7 @@ class DashHeader extends GetView<DashboardController> {
                         child: Text(
                             "مرحباً ${controller.konoozeServices.sharedPrefrences.getString("userName")}",
                             style: Get.textTheme.headlineSmall),
-                      )
+                      ),
                     ],
                   ),
                 ),
